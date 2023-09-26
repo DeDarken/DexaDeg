@@ -24,6 +24,8 @@ import {APP_PORT} from '@keplr-wallet/router';
 import EventEmitter from 'eventemitter3';
 import {HugeQueriesStore} from './huge-queries';
 import {ChainStore} from './chain';
+import {UIConfigStore} from './ui-config';
+import {ICNSInfo} from '../utils/config.ui';
 
 export class RootStore {
   public readonly keyRingStore: KeyRingStore;
@@ -50,6 +52,7 @@ export class RootStore {
     ]
   >;
   public readonly accountStore: AccountStore<[CosmosAccount, SecretAccount]>;
+  public readonly uiConfigStore: UIConfigStore;
 
   constructor() {
     const router = new RNRouterUI(RNEnv.produceEnv);
@@ -310,6 +313,18 @@ export class RootStore {
       this.queriesStore,
       this.accountStore,
       this.priceStore,
+    );
+
+    this.uiConfigStore = new UIConfigStore(
+      {
+        kvStore: new AsyncKVStore('store_ui_config'),
+        addressBookKVStore: new AsyncKVStore('address-book'),
+      },
+      new RNMessageRequesterInternal(),
+      this.chainStore,
+      this.keyRingStore,
+      this.priceStore,
+      ICNSInfo,
     );
 
     router.listen(APP_PORT);
