@@ -348,6 +348,36 @@ export class IBCSwapAmountConfig extends AmountConfig {
       };
     }
 
+    if (this.amount.length > 0) {
+      if (
+        !this.skipQueries.queryIBCSwap.isSwappableCurrency(
+          this.chainId,
+          this.amount[0].currency
+        )
+      ) {
+        return {
+          ...prev,
+          error: new Error(
+            "The currency you are swapping from is currently not supported"
+          ),
+        };
+      }
+    }
+
+    if (
+      !this.skipQueries.queryIBCSwap.isSwapDestinationOrAlternatives(
+        this.outChainId,
+        this.outAmount.currency
+      )
+    ) {
+      return {
+        ...prev,
+        error: new Error(
+          "The currency you are swapping to is currently not supported"
+        ),
+      };
+    }
+
     return {
       ...prev,
     };
